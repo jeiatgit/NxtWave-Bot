@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NxtWave growth plan: 500 registrations in 7 days</title>
+<style>
+:root{--ink:#0f1b3d;--mute:#5a6788;--blue:#2447f5;--teal:#0fb5a5;--orange:#ff7a1a;--violet:#7b3ff2;--gold:#ffb703;--line:#d9e0f2}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:#eef2fc;color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.deck{height:100%;position:relative;overflow:hidden}
+.s{--a:var(--blue);position:absolute;inset:0;display:none;flex-direction:column;gap:18px;padding:78px 6vw 84px;overflow:auto;
+ background:
+  radial-gradient(circle at 92% 8%,rgba(36,71,245,.18),transparent 34%),
+  radial-gradient(circle at 4% 96%,rgba(255,183,3,.22),transparent 32%),
+  radial-gradient(rgba(15,27,61,.09) 1.2px,transparent 1.3px) 0 0/26px 26px,
+  linear-gradient(135deg,#f7f9ff,#e8eeff)}
+.s.on{display:flex}
+.s:nth-child(2){--a:var(--teal)}.s:nth-child(3){--a:var(--orange)}.s:nth-child(4){--a:var(--violet)}.s:nth-child(5){--a:var(--gold)}
+.top{position:absolute;left:0;right:0;top:0;height:56px;padding:0 6vw;display:flex;align-items:center;gap:12px;background:linear-gradient(90deg,var(--ink),#1c2f6b);color:#fff;font-size:.9rem}
+.top:after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:4px;background:linear-gradient(90deg,var(--blue),var(--teal),var(--orange),var(--violet),var(--gold))}
+.logo{background:linear-gradient(135deg,var(--blue),#5b7bff);width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:.8rem}
+.pg{margin-left:auto;background:rgba(255,255,255,.14);border-radius:999px;padding:2px 12px;font-size:.8rem}
+h2{font-family:"Iowan Old Style",Georgia,serif;font-weight:700;letter-spacing:-.01em;line-height:1.12;font-size:clamp(25px,3.3vw,42px);max-width:26ch;position:relative}
+h2:after{content:"";display:block;width:84px;height:5px;border-radius:3px;margin-top:12px;background:linear-gradient(90deg,var(--a),var(--gold))}
+h3{font-size:1.05rem;margin-bottom:6px}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 14px;font-size:.88rem;box-shadow:0 4px 12px rgba(36,71,245,.08)}
+.chip b{color:var(--blue)}
+.ghost{position:absolute;right:5vw;top:70px;font-family:Georgia,serif;font-weight:700;font-size:clamp(120px,22vw,300px);line-height:1;color:rgba(36,71,245,.07);pointer-events:none}
+.grid{display:grid;gap:18px;grid-template-columns:repeat(3,1fr)}
+.card{background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 12px 32px rgba(36,71,245,.12);border-top:5px solid var(--a);position:relative}
+.card p,.card li{color:#2b3856;font-size:.93rem;margin-bottom:6px}
+.card ul{padding-left:1.1em}
+.card.c1{border-top-color:var(--blue)}.card.c2{border-top-color:var(--orange)}.card.c3{border-top-color:var(--teal)}
+.ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:1.3rem;margin-bottom:8px;background:color-mix(in srgb,var(--a) 16%,#fff)}
+.c1 .ic{background:#e4eaff}.c2 .ic{background:#ffe9d9}.c3 .ic{background:#d9f5f2}
+.num{font-family:Georgia,serif;font-weight:700;font-size:2.4rem;line-height:1;color:var(--a)}
+.c1 .num{color:var(--blue)}.c2 .num{color:var(--orange)}.c3 .num{color:var(--teal)}
+.lbl{color:var(--mute);font-size:.82rem;margin-bottom:8px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.row{display:grid;grid-template-columns:150px 1fr 48px;gap:10px;align-items:center;margin:9px 0;font-size:.9rem}
+.row small{display:block;color:var(--mute);font-size:.74rem}
+.trk{height:16px;background:#eaeefa;border-radius:8px;overflow:hidden}
+.trk i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,var(--blue),#6f8aff)}
+.trk.o i{background:linear-gradient(90deg,var(--orange),#ffb169)}
+.row b{text-align:right;font-variant-numeric:tabular-nums}
+.tot{display:flex;justify-content:space-between;margin-top:10px;padding:8px 12px;border-radius:10px;background:var(--ink);color:#fff;font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.kpi{border-radius:14px;padding:12px 18px;color:#fff;display:flex;align-items:center;gap:14px}
+.kpi:nth-child(1){background:linear-gradient(135deg,var(--blue),#5b7bff)}
+.kpi:nth-child(2){background:linear-gradient(135deg,var(--teal),#3fd6c6)}
+.kpi:nth-child(3){background:linear-gradient(135deg,var(--orange),#ffa05a)}
+.kpi b{font-family:Georgia,serif;font-size:1.9rem;line-height:1;white-space:nowrap}
+.kpi span{font-size:.82rem;line-height:1.3}
+.steps{list-style:none;padding:0;counter-reset:f}
+.steps li{counter-increment:f;position:relative;padding:6px 0 6px 42px;font-size:.92rem;border-bottom:1px dashed var(--line)}
+.steps li:last-child{border:0}
+.steps li:before{content:counter(f);position:absolute;left:0;top:6px;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--violet),#a77bff);color:#fff;text-align:center;line-height:28px;font-weight:700;font-size:.85rem}
+.phone{width:250px;margin:0 auto;background:#10172e;border-radius:30px;padding:12px;box-shadow:0 18px 40px rgba(15,27,61,.3)}
+.ph-h{background:#128c7e;color:#fff;border-radius:18px 18px 0 0;padding:8px 12px;font-size:.8rem;font-weight:600}
+.ph-b{background:#e9e1d6;padding:10px;border-radius:0 0 18px 18px;display:flex;flex-direction:column;gap:6px;min-height:170px}
+.m{max-width:85%;padding:6px 9px;border-radius:10px;font-size:.74rem;line-height:1.35;background:#fff}
+.m.me{align-self:flex-end;background:#d9fdd3}
+.demo{margin-top:12px;background:var(--ink);color:#fff;border-radius:12px;padding:12px 16px;font-size:.9rem}
+.demo a{color:var(--gold)}
+.foot{margin-top:auto;font-size:.8rem;color:var(--mute);border-left:4px solid var(--gold);padding:2px 0 2px 10px}
+.nav{position:absolute;left:0;right:0;bottom:0;padding:12px 6vw;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.92);border-top:1px solid var(--line);backdrop-filter:blur(6px)}
+.bar{flex:1;height:8px;background:#e1e7f7;border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--teal),var(--gold));transition:width .25s}
+.min{color:var(--mute);font-size:.82rem;min-width:11ch}
+button{font:inherit;font-size:.9rem;background:var(--ink);color:#fff;border:0;border-radius:8px;padding:6px 16px;cursor:pointer}
+button.alt{background:#fff;color:var(--ink);border:1px solid var(--ink)}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media(max-width:850px){.grid,.two,.kpis{grid-template-columns:1fr}.row{grid-template-columns:110px 1fr 40px}.ghost{display:none}}
+@media print{
+@page{size:1280px 720px;margin:0}
+html,body{height:auto;font-size:15px}
+.deck{height:auto;overflow:visible}
+.s{display:flex!important;position:relative;width:1280px;height:720px;overflow:hidden;padding:76px 60px 28px;page-break-after:always;break-after:page}
+.nav{display:none}
+h2{font-size:34px}
+*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- 1 -->
+<section class="s on">
+  <div class="top"><span class="logo">NW</span>NxtWave Growth Intern Challenge<span class="pg">1 / 5</span></div>
+  <div class="ghost">60</div>
+  <div class="chips"><span class="chip">Goal <b>500 registrations</b></span><span class="chip">Budget <b>₹2,000</b></span><span class="chip">Timeline <b>7 days</b></span><span class="chip">Jeiesh J S</span></div>
+  <h2>Final-years at Tier-2 and Tier-3 colleges want one real AI project before placement drives.</h2>
+  <div class="grid">
+    <div class="card c1"><div class="ic">🎯</div><h3>Who we target</h3><p>Final-year B.Tech students (2025/2026 batch) at Tier-2/3 engineering colleges.</p><p>CSE/IT want proof of AI skills. ECE, EEE, Mech and Civil want a way into tech roles and fear the math.</p></div>
+    <div class="card c2"><div class="ic">🔥</div><h3>Why they care</h3><p>Recruiters filter out generic projects like "Library Management System".</p><p>They can't commit to a six-month bootcamp now, and need something live on a resume before the next drive.</p></div>
+    <div class="card c3"><div class="ic">⚡</div><h3>What makes them register</h3><ul><li>Free, so no financial risk</li><li>60 minutes in the browser, no setup</li><li>A live project and a certificate</li><li>Referral unlocks: resume kit and placement Q&amp;A</li></ul></div>
+  </div>
+  <div class="foot">Key insight: peers move this audience, ads don't.</div>
+</section>
+
+<!-- 2 -->
+<section class="s">
+  <div class="top"><span class="logo">NW</span>NxtWave Growth Intern Challenge<span class="pg">2 / 5</span></div>
+  <h2>Three engines, each chosen because it is cheap and trusted.</h2>
+  <div class="grid">
+    <div class="card c1"><div class="ic">🏫</div><div class="num">320</div><div class="lbl">registrations</div><h3>Class reps and tech clubs</h3><p>Recruit 10–12 class reps and club leads across 20+ colleges as "Campus Hosts", each with a ready-to-paste message and tracked link.</p><p><b>Why it works:</b> a post from a classmate in a class group carries trust a brand ad can't buy.</p></div>
+    <div class="card c2"><div class="ic">🔗</div><div class="num">123</div><div class="lbl">registrations</div><h3>Referral loop</h3><p>Every registrant gets a personal link.</p><ul><li>1 friend: placement Q&amp;A PDF</li><li>3 friends: resume kit and starter repo</li><li>Top 5 referrers: ₹200 vouchers</li></ul><p>Assumed viral factor: 0.30.</p></div>
+    <div class="card c3"><div class="ic">📣</div><div class="num">90</div><div class="lbl">registrations</div><h3>Social proof push</h3><p>A shareable "I'm registered" card for WhatsApp Status and LinkedIn. Seeing batchmates post creates the fear of falling behind on AI.</p><p><b>Why it works:</b> every signup becomes free reach.</p></div>
+  </div>
+  <div class="foot">Rejected: paid ads (too few leads for ₹2,000) and cold emails to placement officers (slow approval, low open rate).</div>
+</section>
+
+<!-- 3 -->
+<section class="s">
+  <div class="top"><span class="logo">NW</span>NxtWave Growth Intern Challenge<span class="pg">3 / 5</span></div>
+  <h2>How 500 comes in on ₹2,000, at about ₹3.75 per registration.</h2>
+  <div class="two">
+    <div class="card c1">
+      <h3>Where 533 registrations come from</h3>
+      <div class="row"><div>Class groups<small>45 groups × 100 × 6%</small></div><div class="trk"><i style="width:100%"></i></div><b>270</b></div>
+      <div class="row"><div>Referral loop<small>410 × 0.30</small></div><div class="trk"><i style="width:46%"></i></div><b>123</b></div>
+      <div class="row"><div>Social sharing<small>1,500 reached × 6%</small></div><div class="trk"><i style="width:33%"></i></div><b>90</b></div>
+      <div class="row"><div>Clubs and cells<small>1,000 reached × 5%</small></div><div class="trk"><i style="width:19%"></i></div><b>50</b></div>
+      <div class="tot"><span>Total (107% of target)</span><span>533</span></div>
+    </div>
+    <div class="card c2">
+      <h3>Where the ₹2,000 goes</h3>
+      <div class="row"><div>Referrer vouchers<small>5 × ₹200</small></div><div class="trk o"><i style="width:100%"></i></div><b>1,000</b></div>
+      <div class="row"><div>Class-rep tokens<small>10 × ₹50</small></div><div class="trk o"><i style="width:50%"></i></div><b>500</b></div>
+      <div class="row"><div>Reminder messages<small>estimate</small></div><div class="trk o"><i style="width:30%"></i></div><b>300</b></div>
+      <div class="row"><div>Contingency<small>buffer</small></div><div class="trk o"><i style="width:20%"></i></div><b>200</b></div>
+      <div class="tot"><span>Total</span><span>₹2,000</span></div>
+    </div>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><b>₹3.75</b><span>cost per registration</span></div>
+    <div class="kpi"><b>~210</b><span>expected live attendees at 40%</span></div>
+    <div class="kpi"><b>Day 3</b><span>checkpoint: groups under 4%? Shift to referrals</span></div>
+  </div>
+  <div class="foot">Conversion rates are assumptions, replaced with measured numbers in the first 48 hours. Paid ads at an assumed ₹25–40 per lead would give only 50–80 signups.</div>
+</section>
+
+<!-- 4 -->
+<section class="s">
+  <div class="top"><span class="logo">NW</span>NxtWave Growth Intern Challenge<span class="pg">4 / 5</span></div>
+  <h2>A WhatsApp bot that registers students, shares referral links and drives attendance.</h2>
+  <div class="two">
+    <div class="card">
+      <h3>The flow</h3>
+      <ol class="steps">
+        <li>Student says "Hi"; the bot explains the workshop</li>
+        <li>Bot collects name, college and email</li>
+        <li>Bot sends confirmation, calendar link and a personal referral link</li>
+        <li>Reminders: 3 days, 1 day and 1 hour before</li>
+        <li>Referral milestones unlock rewards automatically</li>
+        <li>After the workshop: feedback form and certificate</li>
+      </ol>
+    </div>
+    <div>
+      <div class="phone">
+        <!-- Status bar -->
+        <div style="background:#1f2c34;padding:4px 10px;display:flex;justify-content:space-between;align-items:center;border-radius:18px 18px 0 0">
+          <span style="color:#aaa;font-size:9px">9:41 AM</span>
+          <span style="color:#aaa;font-size:9px">&#9679;&#9679;&#9679;&#9679; &#128267;</span>
+        </div>
+        <!-- WA Header -->
+        <div style="background:#1f2c34;padding:6px 10px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #2a3942">
+          <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#00a884,#25d366);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">&#129302;</div>
+          <div style="flex:1">
+            <div style="color:#e9edef;font-size:12px;font-weight:600">NxtWave Bot</div>
+            <div style="color:#25d366;font-size:9px">online</div>
+          </div>
+          <div style="color:#8696a0;font-size:14px">&#8942;</div>
+        </div>
+        <!-- Chat -->
+        <div style="background:#0d1418;padding:8px 6px;display:flex;flex-direction:column;gap:4px;min-height:150px;border-radius:0 0 18px 18px">
+          <div style="align-self:flex-end;background:#005c4b;color:#e9edef;padding:5px 8px;border-radius:7px 7px 2px 7px;font-size:9.5px;max-width:80%;line-height:1.3">Hi <span style="color:#53bdeb;float:right;margin-left:6px;font-size:8px">9:41 &#10003;&#10003;</span></div>
+          <div style="align-self:flex-start;background:#1f2c34;color:#e9edef;padding:5px 8px;border-radius:7px 7px 7px 2px;font-size:9.5px;max-width:85%;line-height:1.3">Hey! Build your first AI project in 60 minutes. Free. What&#39;s your name? <span style="color:#8696a0;float:right;margin-left:6px;font-size:8px">9:41</span></div>
+          <div style="align-self:flex-end;background:#005c4b;color:#e9edef;padding:5px 8px;border-radius:7px 7px 2px 7px;font-size:9.5px;max-width:80%;line-height:1.3">Ravi, from JNTU <span style="color:#53bdeb;float:right;margin-left:6px;font-size:8px">9:42 &#10003;&#10003;</span></div>
+          <div style="align-self:flex-start;background:#1f2c34;color:#e9edef;padding:5px 8px;border-radius:7px 7px 7px 2px;font-size:9.5px;max-width:85%;line-height:1.3">You&#39;re in, Ravi! &#127881; Share code <b style="color:#25d366">RAVI-K7X2</b> — 3 referrals unlocks your Resume Kit &#128196; <span style="color:#8696a0;float:right;margin-left:6px;font-size:8px">9:42</span></div>
+        </div>
+      </div>
+      <div class="demo">Live demo: <a href="https://jeiatgit.github.io/NxtWave-Bot" target="_blank">jeiatgit.github.io/NxtWave-Bot</a></div>
+    </div>
+  </div>
+  <div class="foot">Why this, not a landing page: a landing page only captures intent. This flow drives referrals (123 of 533) and attendance.</div>
+</section>
+
+<!-- 5 -->
+<section class="s">
+  <div class="top"><span class="logo">NW</span>NxtWave Growth Intern Challenge<span class="pg">5 / 5</span></div>
+  <h2>How my thinking changed, and where I overruled the AI.</h2>
+  <div class="grid">
+    <div class="card c1"><div class="ic">🔄</div><h3>What changed</h3><p><b>First idea:</b> IIT/NIT students, LinkedIn DMs and a small paid boost.</p><p><b>Final:</b> Tier-2/3 students, class reps, a referral loop and no paid ads.</p><p><b>Why:</b> the paid math couldn't reach 500, and this audience trusts peers.</p></div>
+    <div class="card c3"><div class="ic">⏱️</div><h3>With 24 more hours</h3><ul><li>Test with 20 real students and replace assumed conversion rates with measured ones</li><li>Connect the bot to the real WhatsApp Cloud API</li><li>Add a live referral leaderboard</li></ul></div>
+    <div class="card c2"><div class="ic">🚫</div><h3>What AI suggested and I rejected</h3><ul><li>Google and YouTube ads: too few leads at ₹2,000</li><li>A formal WhatsApp message: I made it short and conversational</li><li>2–3% group conversion: I used 6% because the offer is free and the sender is trusted</li></ul></div>
+  </div>
+  <div class="foot">Decision: bottom-up peer growth over top-down outreach.</div>
+</section>
+
+</div>
+<div class="nav">
+  <button class="alt" id="prev">Prev</button>
+  <button id="next">Next</button>
+  <div class="bar"><i id="fill"></i></div>
+  <span class="min" id="min">Minute 0 of 60</span>
+  <button class="alt" onclick="window.print()">Save as PDF</button>
+</div>
+<script>
+const s=[...document.querySelectorAll('.s')];let i=0;
+function go(n){i=Math.max(0,Math.min(s.length-1,n));s.forEach((x,k)=>x.classList.toggle('on',k===i));
+document.getElementById('fill').style.width=((i+1)/s.length*100)+'%';
+document.getElementById('min').textContent='Minute '+(i*15)+' of 60';}
+document.getElementById('prev').onclick=()=>go(i-1);
+document.getElementById('next').onclick=()=>go(i+1);
+addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')go(i+1);if(e.key==='ArrowLeft')go(i-1)});
+go(0);
+</script>
+</body>
+</html>
