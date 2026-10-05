@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NxtWave AI Workshop — WhatsApp Registration Bot</title>
+  <meta name="description" content="Register for NxtWave's free 60-min AI workshop. Simulation of the WhatsApp bot that handles registration, referrals and reminders." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /*──────────────────────────────────────
+      ROOT & RESET
+    ──────────────────────────────────────*/
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --wa-bg:          #0b1014;
+      --wa-chat-bg:     #0d1418;
+      --wa-header:      #1f2c34;
+      --wa-input-bg:    #1f2c34;
+      --wa-bot:         #1f2c34;
+      --wa-user:        #005c4b;
+      --wa-green:       #00a884;
+      --wa-lgreen:      #25d366;
+      --wa-text:        #e9edef;
+      --wa-sub:         #8696a0;
+      --wa-tick:        #53bdeb;
+      --wa-line:        #2a3942;
+      --gold:           #ffb703;
+      --blue:           #2447f5;
+      --orange:         #ff7a1a;
+      --violet:         #7b3ff2;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--wa-bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /*──────────────────────────────────────
+      TOP BANNER
+    ──────────────────────────────────────*/
+    .banner {
+      width: 100%;
+      background: linear-gradient(135deg, #005c4b, #00a884);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 20px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .banner-text { color: #fff; font-size: 13px; font-weight: 500; }
+    .banner-text span { opacity: 0.8; }
+    .demo-btn {
+      background: rgba(255,255,255,0.2);
+      border: 1.5px solid rgba(255,255,255,0.5);
+      color: #fff;
+      font: 600 12px/1 'Inter', sans-serif;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .demo-btn:hover { background: rgba(255,255,255,0.35); }
+
+    /*──────────────────────────────────────
+      LAYOUT — phone + aside
+    ──────────────────────────────────────*/
+    .layout {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 16px 48px;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    /*──────────────────────────────────────
+      PHONE SHELL
+    ──────────────────────────────────────*/
+    .phone {
+      width: 100%;
+      max-width: 400px;
+      flex-shrink: 0;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      height: 680px;
+      background: var(--wa-chat-bg);
+    }
+
+    /* Header */
+    .wa-hdr {
+      background: var(--wa-header);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .wa-back { color: var(--wa-sub); font-size: 20px; }
+    .avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00a884, #25d366);
+      display: grid; place-items: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .hdr-info { flex: 1; }
+    .hdr-name { color: var(--wa-text); font-size: 15px; font-weight: 600; }
+    .hdr-status { color: var(--wa-lgreen); font-size: 12px; }
+    .hdr-icons { color: var(--wa-sub); font-size: 18px; display: flex; gap: 18px; }
+
+    /* Messages */
+    .wa-msgs {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 10px 8px;
+      scroll-behavior: smooth;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .wa-msgs::-webkit-scrollbar { width: 4px; }
+    .wa-msgs::-webkit-scrollbar-thumb { background: #2a3942; border-radius: 4px; }
+
+    /* Date chip */
+    .date-chip { text-align: center; margin: 8px 0; }
+    .date-chip span {
+      background: #1f2c34;
+      color: var(--wa-sub);
+      font-size: 11.5px;
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+
+    /* Bubbles */
+    .msg-row { display: flex; margin: 2px 0; }
+    .msg-row.bot  { justify-content: flex-start; }
+    .msg-row.user { justify-content: flex-end; }
+    .msg-row.system { justify-content: center; }
+
+    .bubble {
+      max-width: 80%;
+      padding: 7px 10px 6px;
+      border-radius: 7.5px;
+      font-size: 13.5px;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+    .bubble.bot  { background: var(--wa-bot);  color: var(--wa-text); border-top-left-radius: 2px; }
+    .bubble.user { background: var(--wa-user); color: var(--wa-text); border-top-right-radius: 2px; }
+    .bubble.sys  {
+      background: rgba(31,44,52,0.85);
+      color: var(--wa-sub);
+      font-size: 11.5px;
+      border-radius: 8px;
+      padding: 4px 12px;
+      text-align: center;
+    }
+    .bubble .t { font-size: 10.5px; color: var(--wa-sub); float: right; margin-left: 8px; margin-top: 3px; }
+    .bubble.user .t::after { content: ' ✓✓'; color: var(--wa-tick); }
+
+    /* Typing dots */
+    .typing {
+      background: var(--wa-bot);
+      border-radius: 7.5px;
+      border-top-left-radius: 2px;
+      padding: 10px 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .typing span {
+      width: 7px; height: 7px;
+      background: var(--wa-sub);
+      border-radius: 50%;
+      animation: tdot 1.2s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: .2s; }
+    .typing span:nth-child(3) { animation-delay: .4s; }
+    @keyframes tdot {
+      0%,80%,100% { transform: translateY(0); opacity: 0.5; }
+      40%          { transform: translateY(-6px); opacity: 1; }
+    }
+
+    /* Quick-reply options */
+    .opts-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 6px 10px 4px;
+      justify-content: flex-end;
+    }
+    .opt {
+      background: transparent;
+      border: 1.5px solid var(--wa-green);
+      color: var(--wa-green);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font: 500 13px/1 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .opt:hover  { background: var(--wa-green); color: #fff; }
+    .opt:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+
+    /* Input bar */
+    .wa-bar {
+      background: var(--wa-header);
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .emoji-ic { color: var(--wa-sub); font-size: 22px; flex-shrink: 0; }
+    .wa-in {
+      flex: 1;
+      background: var(--wa-input-bg);
+      border: none;
+      border-radius: 24px;
+      padding: 9px 16px;
+      color: var(--wa-text);
+      font: 14px/1 'Inter', sans-serif;
+      outline: none;
+    }
+    .wa-in::placeholder { color: var(--wa-sub); }
+    .wa-in:disabled { opacity: 0.5; cursor: not-allowed; }
+    .send-ic {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: var(--wa-green);
+      border: none;
+      cursor: pointer;
+      display: grid; place-items: center;
+      font-size: 17px;
+      color: #fff;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .send-ic:hover    { background: var(--wa-lgreen); }
+    .send-ic:disabled { background: #2a3942; cursor: not-allowed; }
+
+    /*──────────────────────────────────────
+      REFERRAL CARD (shown after registration)
+    ──────────────────────────────────────*/
+    .ref-card {
+      background: #152028;
+      border: 1px solid var(--wa-line);
+      border-radius: 12px;
+      padding: 14px;
+      margin: 6px 4px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .ref-card.show { display: flex; }
+    .ref-title { color: var(--wa-text); font-size: 13px; font-weight: 600; }
+    .ref-code-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ref-code {
+      background: var(--wa-header);
+      color: var(--wa-lgreen);
+      font: 700 15px/1 monospace;
+      padding: 8px 14px;
+      border-radius: 8px;
+      letter-spacing: 2px;
+      flex: 1;
+      text-align: center;
+    }
+    .copy-btn {
+      background: var(--wa-green);
+      border: none;
+      color: #fff;
+      font: 600 12px/1 'Inter', sans-serif;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .copy-btn:hover { background: var(--wa-lgreen); }
+
+    /* Tiers */
+    .tiers { display: flex; flex-direction: column; gap: 6px; }
+    .tier {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--wa-header);
+      border-radius: 8px;
+      padding: 8px 12px;
+      opacity: 0.6;
+    }
+    .tier.unlocked { opacity: 1; border-left: 3px solid var(--wa-lgreen); }
+    .tier-icon { font-size: 16px; flex-shrink: 0; }
+    .tier-info { flex: 1; }
+    .tier-label { color: var(--wa-text); font-size: 12px; font-weight: 600; }
+    .tier-desc  { color: var(--wa-sub);  font-size: 11px; }
+    .tier-lock  { color: var(--wa-sub);  font-size: 13px; }
+
+    /* Action buttons */
+    .action-row { display: flex; gap: 8px; }
+    .act-btn {
+      flex: 1;
+      background: var(--wa-header);
+      border: 1.5px solid var(--wa-line);
+      color: var(--wa-text);
+      font: 600 12px/1 'Inter', sans-serif;
+      padding: 9px 8px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      text-align: center;
+    }
+    .act-btn:hover { border-color: var(--wa-green); background: rgba(0,168,132,0.1); }
+    .act-btn.primary { background: var(--wa-green); border-color: var(--wa-green); color: #fff; }
+    .act-btn.primary:hover { background: var(--wa-lgreen); border-color: var(--wa-lgreen); }
+
+    /* Sheet status */
+    .sheet-status {
+      text-align: center;
+      font-size: 11px;
+      color: var(--wa-sub);
+      padding: 2px 0;
+    }
+    .sheet-status.ok  { color: var(--wa-lgreen); }
+    .sheet-status.err { color: #ff6b6b; }
+
+    /*──────────────────────────────────────
+      DEMO ASIDE (reminder timeline)
+    ──────────────────────────────────────*/
+    .aside {
+      width: 300px;
+      flex-shrink: 0;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .aside.show { display: flex; }
+    .aside-title {
+      color: var(--wa-text);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 14px;
+      background: var(--wa-header);
+      border-radius: 10px;
+      text-align: center;
+    }
+    .drip-step {
+      background: var(--wa-header);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s, transform 0.4s;
+    }
+    .drip-step.visible { opacity: 1; transform: none; }
+    .drip-when {
+      color: var(--wa-sub);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .drip-msg {
+      background: var(--wa-bot);
+      color: var(--wa-text);
+      font-size: 12.5px;
+      line-height: 1.45;
+      padding: 8px 10px;
+      border-radius: 7px;
+      border-top-left-radius: 2px;
+    }
+
+    /*──────────────────────────────────────
+      BELOW-PHONE NOTE
+    ──────────────────────────────────────*/
+    .note {
+      max-width: 424px;
+      width: 100%;
+      margin-top: 16px;
+      padding: 0 4px;
+    }
+    .note p {
+      color: var(--wa-sub);
+      font-size: 11.5px;
+      line-height: 1.7;
+      text-align: center;
+    }
+    .note a { color: var(--wa-green); text-decoration: none; }
+    .note code {
+      background: var(--wa-header);
+      color: var(--wa-lgreen);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+
+    /*──────────────────────────────────────
+      RESPONSIVE
+    ──────────────────────────────────────*/
+    @media (max-width: 740px) {
+      .aside { display: none !important; }
+      .phone { height: calc(100vh - 52px); border-radius: 0; max-width: 100%; }
+      .layout { padding: 0; }
+      .note { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Banner -->
+<div class="banner">
+  <div class="banner-text">
+    NxtWave AI Workshop — WhatsApp Registration Bot &nbsp;
+    <span>(Simulation — registration flow + reminder drip demo)</span>
+  </div>
+  <button class="demo-btn" id="demoBtnTop" onclick="toggleDemo()">
+    &#9654; Show Reminder Drip
+  </button>
+</div>
+
+<!-- Main layout -->
+<div class="layout">
+
+  <!-- Phone -->
+  <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:400px;">
+    <div class="phone" id="phone">
+      <!-- WA Header -->
+      <div class="wa-hdr">
+        <div class="wa-back">&#8592;</div>
+        <div class="avatar">&#129302;</div>
+        <div class="hdr-info">
+          <div class="hdr-name">NxtWave Bot</div>
+          <div class="hdr-status" id="hdrStatus">online</div>
+        </div>
+        <div class="hdr-icons"><span>&#128249;</span><span>&#128222;</span><span>&#8942;</span></div>
+      </div>
+
+      <!-- Messages -->
+      <div class="wa-msgs" id="msgs">
+        <div class="date-chip"><span>Today &bull; Sat 10 Oct 2026</span></div>
+      </div>
+
+      <!-- Referral card (hidden until success) -->
+      <div class="ref-card" id="refCard">
+        <div class="ref-title">&#127873; Your personal referral code</div>
+        <div class="ref-code-row">
+          <div class="ref-code" id="refCode">----</div>
+          <button class="copy-btn" onclick="copyCode()">Copy</button>
+        </div>
+        <div class="tiers" id="tiers">
+          <div class="tier" id="tier1">
+            <span class="tier-icon">&#128196;</span>
+            <div class="tier-info">
+              <div class="tier-label">1 friend &#8594; Placement Q&amp;A PDF</div>
+              <div class="tier-desc">Refer 1 batchmate who registers</div>
+            </div>
+            <span class="tier-lock">&#128274;</span>
+          </div>
+          <div class="tier" id="tier3">
+            <span class="tier-icon">&#128187;</span>
+            <div class="tier-info">
+              <div class="tier-label">3 friends &#8594; Resume Kit + AI Starter Repo</div>
+              <div class="tier-desc">GitHub repo + resume template</div>
+            </div>
+            <span class="tier-lock">&#128274;</span>
+          </div>
+          <div class="tier" id="tier5">
+            <span class="tier-icon">&#127873;</span>
+            <div class="tier-info">
+              <div class="tier-label">Top 5 referrers &#8594; &#8377;200 Amazon Voucher</div>
+              <div class="tier-desc">Total budget: &#8377;1,000 (5 &times; &#8377;200)</div>
+            </div>
+            <span class="tier-lock">&#128274;</span>
+          </div>
+        </div>
+        <div class="action-row">
+          <button class="act-btn primary" id="waShareBtn" onclick="shareWA()">&#128172; Share on WhatsApp</button>
+          <button class="act-btn" onclick="downloadICS()">&#128197; Add to Calendar</button>
+        </div>
+        <div class="sheet-status" id="sheetStatus"></div>
+      </div>
+
+      <!-- Options -->
+      <div class="opts-row" id="opts"></div>
+
+      <!-- Input bar -->
+      <div class="wa-bar">
+        <span class="emoji-ic">&#128512;</span>
+        <input class="wa-in" id="input" type="text" placeholder="Type a message" disabled />
+        <button class="send-ic" id="sendBtn" disabled onclick="sendMsg()">&#9654;</button>
+      </div>
+    </div>
+
+    <!-- Below-phone note -->
+    <div class="note">
+      <p>
+        This is a <strong style="color:#e9edef">working simulation</strong> of the WhatsApp registration flow.<br>
+        In production: <code>WhatsApp Business API</code> + <code>n8n</code> handles the drip,
+        and each registration posts to a <code>Google Sheet</code> via Apps Script.<br><br>
+        Built for the <a href="https://forms.gle/xEtJSgJfeqvnxv8q6" target="_blank">NxtWave Growth Intern Challenge</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Reminder drip aside -->
+  <div class="aside" id="aside">
+    <div class="aside-title">&#9201; Automated Reminder Drip</div>
+
+    <div class="drip-step" id="d3">
+      <div class="drip-when">D-3 &bull; Wednesday 7 Oct, 10 AM</div>
+      <div class="drip-msg">
+        Hey! Just 3 days to the free AI workshop &#127775;<br><br>
+        &#128336; <b>Saturday, 10 Oct &bull; 10 AM IST</b><br>
+        &#128279; Join link: sent to your email<br><br>
+        Invite a batchmate with your referral code — 3 referrals = free Resume Kit &#127775;
+      </div>
+    </div>
+
+    <div class="drip-step" id="d1">
+      <div class="drip-when">D-1 &bull; Friday 9 Oct, 7 PM</div>
+      <div class="drip-msg">
+        Tomorrow's the day! &#128640;<br><br>
+        &#128640; <b>"Build Your First AI Project in 60 Minutes"</b><br>
+        &#128197; Tomorrow &bull; Sat 10 Oct &bull; 10 AM IST<br><br>
+        No setup needed — just open the link in your browser.<br>
+        Don't forget to share your referral code tonight &#127891;
+      </div>
+    </div>
+
+    <div class="drip-step" id="d0">
+      <div class="drip-when">Day-of &bull; Saturday 10 Oct, 9 AM</div>
+      <div class="drip-msg">
+        &#9889; <b>1 hour to go!</b><br><br>
+        Your join link &#128279;<br>
+        (posted in email)<br><br>
+        See you in there — your AI project awaits &#129302;
+      </div>
+    </div>
+
+    <div class="drip-step" id="dPost">
+      <div class="drip-when">Post-workshop &bull; Saturday 10 Oct, 11:15 AM</div>
+      <div class="drip-msg">
+        &#127881; You built your first AI project!<br><br>
+        &#128196; <b>Your certificate</b>: [link]<br>
+        &#11088; Quick feedback (2 min): [form link]<br><br>
+        Share what you built on LinkedIn — tag NxtWave &#128170;
+      </div>
+    </div>
+  </div>
+
+</div><!-- /layout -->
+
+<!--
+  ============================================================
+  GOOGLE APPS SCRIPT — deploy this as a Web App
+  (New Sheet → Extensions → Apps Script → paste → Deploy)
+  ============================================================
+  function doPost(e) {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const d = JSON.parse(e.postData.contents);
+    sheet.appendRow([
+      new Date(), d.name, d.college, d.branch,
+      d.year, d.email, d.referredBy, d.referralCode
+    ]);
+    return ContentService
+      .createTextOutput(JSON.stringify({status:'ok'}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  Replace SHEET_ENDPOINT below with your deployed Web App URL.
+  ============================================================
+-->
+
+<script>
+'use strict';
+
+/*──────────────────────────────────────
+  CONFIG
+──────────────────────────────────────*/
+// Replace with your deployed Apps Script URL:
+const SHEET_ENDPOINT = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+
+const WORKSHOP_DATE  = 'Saturday, 10 October 2026';
+const WORKSHOP_TIME  = '10:00 AM IST';
+// ICS datetime: 20261010T043000Z = 10:00 AM IST (UTC+5:30)
+const ICS_START      = '20261010T043000Z';
+const ICS_END        = '20261010T050000Z';
+
+/*──────────────────────────────────────
+  STATE
+──────────────────────────────────────*/
+const S = { name:'', college:'', branch:'', year:'', email:'', referredBy:'', code:'' };
+
+/*──────────────────────────────────────
+  DOM REFS
+──────────────────────────────────────*/
+const msgsEl      = document.getElementById('msgs');
+const optsEl      = document.getElementById('opts');
+const inputEl     = document.getElementById('input');
+const sendBtnEl   = document.getElementById('sendBtn');
+const hdrStatusEl = document.getElementById('hdrStatus');
+const refCardEl   = document.getElementById('refCard');
+const refCodeEl   = document.getElementById('refCode');
+const sheetStatEl = document.getElementById('sheetStatus');
+const asideEl     = document.getElementById('aside');
+
+/*──────────────────────────────────────
+  UTILITIES
+──────────────────────────────────────*/
+/** Escape user input before inserting into HTML */
+function esc(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/** Validate email with a reasonable regex */
+function validEmail(v) {
+  return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(v.trim());
+}
+
+function now() {
+  return new Date().toLocaleTimeString('en-IN', {
+    hour: '2-digit', minute: '2-digit', hour12: true
+  });
+}
+
+function scrollBottom() { msgsEl.scrollTop = msgsEl.scrollHeight; }
+
+/** Generate referral code from name */
+function makeCode(name) {
+  const prefix = name.replace(/[^a-zA-Z]/g, '').substring(0, 4).toUpperCase().padEnd(4, 'X');
+  const suffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return prefix + '-' + suffix;
+}
+
+/*──────────────────────────────────────
+  CORE UI HELPERS
+──────────────────────────────────────*/
+function addBot(html, delay = 0) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const tr = document.createElement('div');
+      tr.className = 'msg-row bot';
+      tr.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+      msgsEl.appendChild(tr);
+      scrollBottom();
+      hdrStatusEl.textContent = 'typing...';
+
+      const dur = Math.min(600 + html.length * 11, 2200);
+      setTimeout(() => {
+        tr.remove();
+        hdrStatusEl.textContent = 'online';
+        const row = document.createElement('div');
+        row.className = 'msg-row bot';
+        row.innerHTML = '<div class="bubble bot">' + html + '<span class="t">' + now() + '</span></div>';
+        msgsEl.appendChild(row);
+        scrollBottom();
+        resolve();
+      }, dur);
+    }, delay);
+  });
+}
+
+function addUser(text) {
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = '<div class="bubble user">' + esc(text) + '<span class="t">' + now() + '</span></div>';
+  msgsEl.appendChild(row);
+  scrollBottom();
+}
+
+function addSys(text) {
+  const row = document.createElement('div');
+  row.className = 'msg-row system';
+  row.innerHTML = '<div class="bubble sys">' + esc(text) + '</div>';
+  msgsEl.appendChild(row);
+  scrollBottom();
+}
+
+// Each label can be { html: '...', text: '...' } or a plain string.
+// html = what shows in the button (entities/markup rendered)
+// text = what shows in the user bubble and is passed to the callback
+function showOpts(labels, cb) {
+  optsEl.innerHTML = '';
+  labels.forEach(item => {
+    const displayHtml = (typeof item === 'object') ? item.html : item;
+    const plainText   = (typeof item === 'object') ? item.text : item;
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.innerHTML = displayHtml;          // renders HTML entities & emoji
+    b.onclick = () => {
+      optsEl.querySelectorAll('.opt').forEach(x => x.disabled = true);
+      addUser(plainText);               // plain text in user bubble
+      cb(plainText);
+    };
+    optsEl.appendChild(b);
+  });
+}
+
+function clearOpts() { optsEl.innerHTML = ''; }
+
+let _inputCb = null;
+
+function enableInput(placeholder, cb) {
+  inputEl.disabled = false;
+  inputEl.placeholder = placeholder;
+  inputEl.value = '';
+  sendBtnEl.disabled = false;
+  inputEl.focus();
+
+  _inputCb = () => {
+    const v = inputEl.value.trim();
+    if (!v) return;
+    inputEl.disabled = true;
+    sendBtnEl.disabled = true;
+    inputEl.placeholder = 'Type a message';
+    _inputCb = null;
+    inputEl.onkeydown = null;
+    addUser(v);
+    cb(v);
+  };
+  inputEl.onkeydown = e => { if (e.key === 'Enter') _inputCb && _inputCb(); };
+}
+
+function sendMsg() { _inputCb && _inputCb(); }
+
+/*──────────────────────────────────────
+  REGISTRATION FLOW
+──────────────────────────────────────*/
+async function startFlow() {
+  await addBot('👋 Hi! I&#39;m the <b>NxtWave registration bot</b>.<br><br>I&#39;ll get you signed up for a free workshop — takes about 2 minutes.', 500);
+
+  await addBot('<b>🤖 "Build Your First AI Project in 60 Minutes"</b><br><br>📅 ' + WORKSHOP_DATE + ' &bull; ' + WORKSHOP_TIME + '<br>🆓 Free &bull; 🎓 Certificate &bull; Real project for your resume<br><br>Industry data (NASSCOM, 2026) shows AI-skilled freshers are landing offers <b>1.5&ndash;2x higher</b> than peers in non-AI roles. This workshop gives you that first project &mdash; in one hour.', 300);
+
+  await addBot('How did you hear about this? 👇', 200);
+
+  showOpts(
+    ['Class rep / WhatsApp group', 'LinkedIn post', 'A friend', 'Instagram', 'Found it myself'],
+    choice => { clearOpts(); S.referredBy = choice; stepName(); }
+  );
+}
+
+async function stepName() {
+  await addBot('Got it 👍<br><br>What&#39;s your <b>full name</b>?', 300);
+  enableInput('Your full name...', v => { S.name = v; stepCollege(); });
+}
+
+async function stepCollege() {
+  await addBot('Nice to meet you, <b>' + esc(S.name) + '</b>! 🙌<br><br>Which <b>college</b> are you from?', 300);
+  enableInput('e.g. SRM, VIT, JNTU, Manipal, Amrita...', v => { S.college = v; stepBranch(); });
+}
+
+async function stepBranch() {
+  await addBot('And your <b>branch</b>?', 300);
+  showOpts(['CS / IT', 'ECE / EEE', 'Mechanical', 'Civil', 'Other'], choice => {
+    clearOpts();
+    S.branch = choice;
+    // Branch-tailored response
+    let tailor = '';
+    if (choice === 'CS / IT') {
+      tailor = 'Great &mdash; you already have the coding foundation. This workshop shows you how to wrap it into a deployable AI project 🚀';
+    } else if (choice === 'ECE / EEE') {
+      tailor = 'No heavy math here &mdash; you already understand signals and systems. This is the application layer. You&#39;ll fit right in ✨';
+    } else {
+      tailor = 'More ' + esc(choice) + ' students are breaking into tech roles with AI projects. This is your bridge 💪';
+    }
+    addBot(tailor, 200).then(() => stepYear());
+  });
+}
+
+async function stepYear() {
+  await addBot('What&#39;s your <b>graduation year</b>?', 300);
+  showOpts(['2026', '2027', '2028'], choice => {
+    clearOpts();
+    S.year = choice;
+    stepEmail();
+  });
+}
+
+async function stepEmail() {
+  await addBot('Almost done! 🎯<br><br>Your <b>email address</b> &mdash; confirmation and join link go here:', 300);
+  enableInput('your@email.com', v => {
+    if (!validEmail(v)) {
+      addBot('Hmm, that doesn&#39;t look like a valid email 🤔<br>Try again:', 200)
+        .then(() => enableInput('your@email.com', v2 => { S.email = v2; stepConfirm(); }));
+    } else {
+      S.email = v;
+      stepConfirm();
+    }
+  });
+}
+
+async function stepConfirm() {
+  await addBot(
+    'Here&#39;s your registration summary 👇<br><br>' +
+    '👤 <b>Name:</b> '     + esc(S.name)    + '<br>' +
+    '🏫 <b>College:</b> '  + esc(S.college) + '<br>' +
+    '📚 <b>Branch:</b> '   + esc(S.branch)  + '<br>' +
+    '🎓 <b>Year:</b> '     + esc(S.year)    + '<br>' +
+    '📧 <b>Email:</b> '    + esc(S.email)   + '<br><br>' +
+    'All good?',
+    400
+  );
+  showOpts([
+    { html: 'Confirm &check;', text: 'Confirm' },
+    'Edit Details'
+  ], choice => {
+    clearOpts();
+    if (choice === 'Edit Details') {
+      addBot('No problem! Let&#39;s redo 🔄', 200).then(() => stepName());
+    } else {
+      stepSuccess();
+    }
+  });
+}
+
+async function stepSuccess() {
+  S.code = makeCode(S.name);
+
+  await addBot('🎉 <b>You&#39;re registered, ' + esc(S.name) + '!</b><br><br>Sending confirmation to <b>' + esc(S.email) + '</b>...', 400);
+
+  await addBot(
+    '📧 Confirmation sent! Check your inbox.<br><br>' +
+    '📅 <b>' + WORKSHOP_DATE + ' &bull; ' + WORKSHOP_TIME + '</b><br>' +
+    '🔗 Join link: in your email<br>' +
+    '🔔 Reminder messages: D-3, D-1 and 1 hour before<br><br>' +
+    'Your personal <b>referral code</b> is below 👇 Share it to unlock rewards.',
+    400
+  );
+
+  // Show referral card
+  refCodeEl.textContent = S.code;
+  refCardEl.classList.add('show');
+  scrollBottom();
+
+  // Post to sheet (non-blocking)
+  submitToSheet();
+
+  // Demo mode prompt
+  setTimeout(async () => {
+    await addBot('Want to see what the <b>automated reminders</b> look like?<br>Hit ▶ Show Reminder Drip in the top bar 👉', 600);
+    showOpts([{ html: '🔄 Restart Demo', text: 'Restart Demo' }], () => {
+      clearOpts();
+      refCardEl.classList.remove('show');
+      msgsEl.innerHTML = '<div class="date-chip"><span>Today &bull; Sat 10 Oct 2026</span></div>';
+      Object.keys(S).forEach(k => S[k] = '');
+      startFlow();
+    });
+  }, 800);
+}
+
+/*──────────────────────────────────────
+  GOOGLE SHEET SUBMISSION
+──────────────────────────────────────*/
+function submitToSheet() {
+  sheetStatEl.textContent = 'Saving registration...';
+  sheetStatEl.className = 'sheet-status';
+
+  fetch(SHEET_ENDPOINT, {
+    method: 'POST',
+    body: JSON.stringify({
+      name:        S.name,
+      college:     S.college,
+      branch:      S.branch,
+      year:        S.year,
+      email:       S.email,
+      referredBy:  S.referredBy,
+      referralCode: S.code
+    })
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.status === 'ok') {
+      sheetStatEl.textContent = '✓ Registration saved to Google Sheet';
+      sheetStatEl.className = 'sheet-status ok';
+    }
+  })
+  .catch(() => {
+    sheetStatEl.textContent = '(Simulation mode — replace SHEET_ENDPOINT to enable live saving)';
+    sheetStatEl.className = 'sheet-status err';
+  });
+}
+
+/*──────────────────────────────────────
+  REFERRAL ACTIONS
+──────────────────────────────────────*/
+function copyCode() {
+  navigator.clipboard.writeText(S.code).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 1800);
+  });
+}
+
+function shareWA() {
+  const msg =
+    'Hey! I just registered for a FREE AI workshop by NxtWave 🤖\n\n' +
+    '"Build Your First AI Project in 60 Minutes"\n' +
+    '📅 Sat 10 Oct \u2022 10 AM IST | 🆓 Free | 🎓 Certificate\n\n' +
+    'Use my referral code: ' + S.code + '\n' +
+    'Register: https://ccbp.in/workshop\n\n' +
+    'AI skills = 1.5\u20132x salary at placement. Don\u2019t miss this \u2728';
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+function downloadICS() {
+  const cal = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//NxtWave//AI Workshop//EN',
+    'BEGIN:VEVENT',
+    'DTSTART:' + ICS_START,
+    'DTEND:'   + ICS_END,
+    'SUMMARY:NxtWave \u2014 Build Your First AI Project in 60 Minutes',
+    'DESCRIPTION:Free workshop. Join link emailed. Certificate included.',
+    'URL:https://ccbp.in',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+
+  const blob = new Blob([cal], { type: 'text/calendar' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'nxtwave-ai-workshop.ics';
+  a.click();
+}
+
+/*──────────────────────────────────────
+  DEMO MODE — reminder drip aside
+──────────────────────────────────────*/
+let demoOpen = false;
+function toggleDemo() {
+  demoOpen = !demoOpen;
+  const btn = document.getElementById('demoBtnTop');
+  if (demoOpen) {
+    asideEl.classList.add('show');
+    btn.textContent = '\u25a0 Hide Reminder Drip';
+    runDripAnimation();
+  } else {
+    asideEl.classList.remove('show');
+    btn.textContent = '\u25b6 Show Reminder Drip';
+  }
+}
+
+function runDripAnimation() {
+  const steps = ['d3', 'd1', 'd0', 'dPost'];
+  steps.forEach(id => {
+    document.getElementById(id).classList.remove('visible');
+  });
+  steps.forEach((id, i) => {
+    setTimeout(() => {
+      document.getElementById(id).classList.add('visible');
+    }, i * 700);
+  });
+}
+
+/*──────────────────────────────────────
+  BOOT
+──────────────────────────────────────*/
+window.addEventListener('load', () => setTimeout(startFlow, 500));
+</script>
+</body>
+</html>
